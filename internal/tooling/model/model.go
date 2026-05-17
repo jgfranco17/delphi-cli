@@ -1,4 +1,4 @@
-package statusline
+package model
 
 import (
 	"fmt"
@@ -8,10 +8,23 @@ import (
 	"github.com/fatih/color"
 )
 
-const conversionRateUSDJPY = 150.0
+const (
+	barWidth             = 10
+	conversionRateUSDJPY = 150.0
+)
 
-// Input is the JSON structure piped from Claude Code.
-type Input struct {
+var (
+	ColorBold     = color.New(color.Bold)
+	ColorDim      = color.New(color.Faint)
+	ColorBoldCyan = color.New(color.FgCyan, color.Bold)
+	ColorYellow   = color.New(color.FgYellow)
+	ColorGreen    = color.New(color.FgGreen)
+	ColorRed      = color.New(color.FgRed)
+	ColorMagenta  = color.New(color.FgMagenta)
+)
+
+// AgentInput is the JSON structure piped from Claude Code.
+type AgentInput struct {
 	Model         Model         `json:"model"`
 	Workspace     Workspace     `json:"workspace"`
 	ContextWindow ContextWindow `json:"context_window"`
@@ -50,11 +63,11 @@ func (c *ContextWindow) Color() *color.Color {
 	pct := int(c.UsedPercentage)
 	switch {
 	case pct >= 80:
-		return colorRed
+		return ColorRed
 	case pct >= 50:
-		return colorYellow
+		return ColorYellow
 	default:
-		return colorGreen
+		return ColorGreen
 	}
 }
 

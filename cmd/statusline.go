@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/fatih/color"
-	"github.com/jgfranco17/delphi-cli/internal/statusline"
+	"github.com/jgfranco17/delphi-cli/internal/tooling/render"
 	"github.com/spf13/cobra"
 )
 
@@ -20,8 +20,8 @@ func newStatuslineCmd() *cobra.Command {
 			if forceColor {
 				color.NoColor = false
 			}
-			renderer := statusline.NewRenderer(os.Stdout, statusline.NewExecGitProvider())
-			return renderer.RenderFromReader(os.Stdin)
+			renderer := render.New(os.Stdout)
+			return renderer.GenerateFrom(cmd.Context(), os.Stdin)
 		},
 	}
 

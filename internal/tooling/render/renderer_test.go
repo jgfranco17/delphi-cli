@@ -1,11 +1,14 @@
-package statusline
+package render
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"strings"
 	"testing"
 
+	"github.com/jgfranco17/delphi-cli/internal/tooling/git"
+	"github.com/jgfranco17/delphi-cli/internal/tooling/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -16,19 +19,21 @@ type mockGitProvider struct {
 	err    error
 }
 
-func (m *mockGitProvider) BranchStatus(_ string) (string, bool, error) {
+func (m *mockGitProvider) BranchStatus(_ context.Context, _ string) (string, bool, error) {
 	return m.branch, m.dirty, m.err
 }
 
-func newTestInput() *Input {
-	return &Input{
-		Model:         Model{DisplayName: "claude-opus-4-5"},
-		Workspace:     Workspace{CurrentDir: "/home/user/project"},
-		ContextWindow: ContextWindow{UsedPercentage: 42},
-		Cost:          Cost{TotalCostUSD: 1.0},
-		RateLimits: RateLimits{
-			FiveHour: &RateLimit{UsedPercentage: 30},
-			SevenDay: &RateLimit{UsedPercentage: 15},
+var _ git.Provider = (*mockGitProvider)(nil)
+
+func newTestInput() *model.AgentInput {
+	return &model.AgentInput{
+		Model:         model.Model{DisplayName: "claude-opus-4-5"},
+		Workspace:     model.Workspace{CurrentDir: "/home/user/project"},
+		ContextWindow: model.ContextWindow{UsedPercentage: 42},
+		Cost:          model.Cost{TotalCostUSD: 1.0},
+		RateLimits: model.RateLimits{
+			FiveHour: &model.RateLimit{UsedPercentage: 30},
+			SevenDay: &model.RateLimit{UsedPercentage: 15},
 		},
 	}
 }
@@ -38,7 +43,7 @@ func TestRenderer_Render_ContainsExpectedText(t *testing.T) {
 	var buf bytes.Buffer
 	r := NewRenderer(&buf, git)
 
-	require.NoError(t, r.Render(newTestInput()))
+	require.NoError(t, r.Render(t.Context(), newTestInput()))
 
 	out := buf.String()
 	assert.Contains(t, out, "claude-opus-4-5")
@@ -56,7 +61,7 @@ func TestRenderer_Render_DirtyBranch(t *testing.T) {
 	var buf bytes.Buffer
 	r := NewRenderer(&buf, git)
 
-	require.NoError(t, r.Render(newTestInput()))
+	require.NoError(t, r.Render(t.Context(), newTestInput()))
 
 	out := buf.String()
 	assert.Contains(t, out, "feature/foo")
@@ -68,7 +73,7 @@ func TestRenderer_Render_NoGitRepo(t *testing.T) {
 	var buf bytes.Buffer
 	r := NewRenderer(&buf, git)
 
-	require.NoError(t, r.Render(newTestInput()))
+	require.NoError(t, r.Render(t.Context(), newTestInput()))
 	assert.Contains(t, buf.String(), "none")
 }
 
@@ -81,7 +86,7 @@ func TestRenderer_Render_NoRateLimits(t *testing.T) {
 	input.RateLimits.FiveHour = nil
 	input.RateLimits.SevenDay = nil
 
-	require.NoError(t, r.Render(input))
+	require.NoError(t, r.Render(t.Context(), input))
 	assert.Contains(t, buf.String(), "undetermined")
 }
 
@@ -93,7 +98,7 @@ func TestRenderer_Render_HighUsageBar(t *testing.T) {
 	input := newTestInput()
 	input.ContextWindow.UsedPercentage = 85
 
-	require.NoError(t, r.Render(input))
+	require.NoError(t, r.Render(t.Context(), input))
 	assert.Contains(t, buf.String(), "85%")
 }
 
@@ -109,7 +114,7 @@ func TestRenderer_RenderFromReader_ValidJSON(t *testing.T) {
 	var buf bytes.Buffer
 	r := NewRenderer(&buf, git)
 
-	require.NoError(t, r.RenderFromReader(strings.NewReader(json)))
+	require.NoError(t, r.GenerateFrom(t.Context(), strings.NewReader(json)))
 
 	out := buf.String()
 	assert.Contains(t, out, "claude-3")
@@ -119,6 +124,6 @@ func TestRenderer_RenderFromReader_ValidJSON(t *testing.T) {
 func TestRenderer_RenderFromReader_InvalidJSON(t *testing.T) {
 	git := &mockGitProvider{}
 	r := NewRenderer(&bytes.Buffer{}, git)
-	err := r.RenderFromReader(strings.NewReader("{not json}"))
+	err := r.GenerateFrom(t.Context(), strings.NewReader("{not json}"))
 	assert.Error(t, err)
 }

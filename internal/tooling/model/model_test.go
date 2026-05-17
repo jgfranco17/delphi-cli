@@ -1,4 +1,4 @@
-package statusline
+package model
 
 import (
 	"fmt"
@@ -28,12 +28,12 @@ func TestContextWindow_Bar(t *testing.T) {
 }
 
 func TestContextWindow_Color(t *testing.T) {
-	assert.Equal(t, colorRed, (&ContextWindow{UsedPercentage: 80}).Color())
-	assert.Equal(t, colorRed, (&ContextWindow{UsedPercentage: 100}).Color())
-	assert.Equal(t, colorYellow, (&ContextWindow{UsedPercentage: 50}).Color())
-	assert.Equal(t, colorYellow, (&ContextWindow{UsedPercentage: 79}).Color())
-	assert.Equal(t, colorGreen, (&ContextWindow{UsedPercentage: 0}).Color())
-	assert.Equal(t, colorGreen, (&ContextWindow{UsedPercentage: 49}).Color())
+	assert.Equal(t, ColorRed, (&ContextWindow{UsedPercentage: 80}).Color())
+	assert.Equal(t, ColorRed, (&ContextWindow{UsedPercentage: 100}).Color())
+	assert.Equal(t, ColorYellow, (&ContextWindow{UsedPercentage: 50}).Color())
+	assert.Equal(t, ColorYellow, (&ContextWindow{UsedPercentage: 79}).Color())
+	assert.Equal(t, ColorGreen, (&ContextWindow{UsedPercentage: 0}).Color())
+	assert.Equal(t, ColorGreen, (&ContextWindow{UsedPercentage: 49}).Color())
 }
 
 func TestCost_Format(t *testing.T) {

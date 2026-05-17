@@ -2,7 +2,6 @@ package logging
 
 import (
 	"bytes"
-	"context"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -12,13 +11,13 @@ import (
 func TestApplyToContext(t *testing.T) {
 	var buf bytes.Buffer
 	logger := New(&buf, logrus.TraceLevel)
-	ctx := AddToContext(context.Background(), logger)
+	ctx := AddToContext(t.Context(), logger)
 	assert.Equal(t, logger, FromContext(ctx))
 }
 
 func TestFromContext(t *testing.T) {
 	var buf bytes.Buffer
 	logger := New(&buf, logrus.TraceLevel)
-	ctx := AddToContext(context.Background(), logger)
+	ctx := AddToContext(t.Context(), logger)
 	assert.Equal(t, logger, FromContext(ctx))
 }
