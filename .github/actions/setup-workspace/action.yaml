@@ -10,6 +10,9 @@ runs:
       with:
         go-version-file: 'go.mod'
 
+    - name: Install Just
+      uses: extractions/setup-just@v2
+
     - name: Install Go modules
       shell: bash
       run: |
