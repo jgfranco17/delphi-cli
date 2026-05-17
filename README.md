@@ -17,9 +17,15 @@ Git: main ✓ clean
 
 #### Flags
 
+Delphi CLI supports the following flags for `statusline`, which can be combined as needed:
+
 | Flag | Default | Description |
 | ------ | --------- | ------------- |
-| `--force-color` | `false` | Force ANSI color output even when stdout is not a TTY |
+| `--all` | `false` | Show all statusline sections |
+| `--cwd` | `false` | Show current working directory |
+| `--git` | `false` | Show git information |
+| `--stats` | `false` | Show usage statistics |
+| `--disable-colors` | `false` | Disable ANSI color output formatting |
 
 **Example** (Claude Code `statusLine` config):
 
@@ -27,7 +33,7 @@ Git: main ✓ clean
 {
     "statusLine": {
         "type": "command",
-        "command": "delphi statusline --force-color",
+        "command": "delphi statusline --all",
         "padding": 2
     },
 }
