@@ -1,4 +1,4 @@
-package git
+package env
 
 import (
 	"context"
@@ -21,10 +21,19 @@ func (g *ExecProvider) BranchStatus(ctx context.Context, dir string) (string, bo
 		return "", false, err
 	}
 	branch := strings.TrimSpace(string(out))
+	isGitDirty := checkGitDirty(ctx, dir)
+	return branch, isGitDirty, nil
+}
 
-	diffErr := exec.CommandContext(ctx, "git", "-C", dir, "diff", "--quiet").Run()
-	cachedErr := exec.CommandContext(ctx, "git", "-C", dir, "diff", "--cached", "--quiet").Run()
-	dirty := diffErr != nil || cachedErr != nil
-
-	return branch, dirty, nil
+func checkGitDirty(ctx context.Context, repositoryDir string) bool {
+	gitCmds := []*exec.Cmd{
+		exec.CommandContext(ctx, "git", "-C", repositoryDir, "diff", "--quiet"),
+		exec.CommandContext(ctx, "git", "-C", repositoryDir, "diff", "--cached", "--quiet"),
+	}
+	for _, cmd := range gitCmds {
+		if err := cmd.Run(); err != nil {
+			return true
+		}
+	}
+	return false
 }

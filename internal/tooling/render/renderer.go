@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/jgfranco17/delphi-cli/internal/tooling/git"
+	"github.com/jgfranco17/delphi-cli/internal/tooling/env"
 	"github.com/jgfranco17/delphi-cli/internal/tooling/model"
 )
 
@@ -40,7 +40,7 @@ func New(opts Options) *StatusLine {
 	if out == nil {
 		out = os.Stdout
 	}
-	return newRenderer(out, git.NewExecProvider(), opts)
+	return newRenderer(out, env.NewExecProvider(), opts)
 }
 
 // GenerateFrom decodes JSON from r and renders the statusline.

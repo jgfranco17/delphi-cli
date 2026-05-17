@@ -1,4 +1,4 @@
-package git
+package env
 
 import (
 	"os"
