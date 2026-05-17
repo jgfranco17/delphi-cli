@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/jgfranco17/delphi-cli/internal/errorhandling"
 	"github.com/jgfranco17/delphi-cli/internal/logging"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -59,6 +60,8 @@ func Execute() {
 	ctx := context.Background()
 	cli := NewCLI()
 	if err := cli.ExecuteContext(ctx); err != nil {
+		errorHandler := errorhandling.New(os.Stderr)
+		errorHandler.RenderError(err)
 		os.Exit(1)
 	}
 }
