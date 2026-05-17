@@ -14,7 +14,7 @@ import (
 // StatusLine writes a formatted statusline to a writer.
 type StatusLine struct {
 	out     io.Writer
-	git     git.Provider
+	git     provider
 	options Options
 }
 
@@ -25,7 +25,12 @@ type Options struct {
 	WithUsageStats bool
 }
 
-func newRenderer(out io.Writer, g git.Provider, opts Options) *StatusLine {
+// provider abstracts git operations for testability.
+type provider interface {
+	BranchStatus(ctx context.Context, dir string) (branch string, dirty bool, err error)
+}
+
+func newRenderer(out io.Writer, g provider, opts Options) *StatusLine {
 	return &StatusLine{out: out, git: g, options: opts}
 }
 

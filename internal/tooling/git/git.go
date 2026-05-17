@@ -6,11 +6,6 @@ import (
 	"strings"
 )
 
-// Provider abstracts git operations for testability.
-type Provider interface {
-	BranchStatus(ctx context.Context, dir string) (branch string, dirty bool, err error)
-}
-
 // ExecProvider is the real implementation that shells out to git.
 type ExecProvider struct{}
 

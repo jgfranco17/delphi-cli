@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jgfranco17/delphi-cli/internal/tooling/git"
 	"github.com/jgfranco17/delphi-cli/internal/tooling/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,7 +22,7 @@ func (m *mockGitProvider) BranchStatus(_ context.Context, _ string) (string, boo
 	return m.branch, m.dirty, m.err
 }
 
-var _ git.Provider = (*mockGitProvider)(nil)
+var _ provider = (*mockGitProvider)(nil)
 
 func newTestInput() *model.AgentInput {
 	return &model.AgentInput{
